@@ -82,3 +82,31 @@ export interface StatsOverview {
   streak_days: number;
   avg_retention: number;
 }
+
+// ========== 链接跳转相关类型 ==========
+
+export interface VideoLink {
+  id: string
+  type: 'video'
+  platform: 'bilibili' | 'youtube'
+  url: string
+  timestamp?: number
+  title: string
+}
+
+export interface WebLink {
+  id: string
+  type: 'link'
+  url: string
+  title: string
+}
+
+export interface AppLink {
+  id: string
+  type: 'app_link'
+  scheme: string
+  fallback_url: string
+  title: string
+}
+
+export type LinkItem = VideoLink | WebLink | AppLink

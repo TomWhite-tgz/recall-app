@@ -77,7 +77,6 @@ export default function ReviewPage() {
       setSessionResults(prev => [...prev, res.data]);
       toast.success(res.data.message, { duration: 1500 });
 
-      // 下一张卡片
       if (currentIndex + 1 < cards.length) {
         setCurrentIndex(prev => prev + 1);
         setShowAnswer(false);
@@ -279,11 +278,14 @@ export default function ReviewPage() {
   );
 }
 
-// 内容渲染组件
+// =============================================
+// 内容渲染组件（支持所有类型）
+// =============================================
 function CardContent({ content }: { content: any }) {
   if (!content) return null;
 
   switch (content.type) {
+    // ---------- 代码 ----------
     case 'code':
       return (
         <SyntaxHighlighter
@@ -295,6 +297,7 @@ function CardContent({ content }: { content: any }) {
         </SyntaxHighlighter>
       );
 
+    // ---------- 图片 ----------
     case 'image':
       return (
         <div className="text-center">
@@ -307,8 +310,98 @@ function CardContent({ content }: { content: any }) {
         </div>
       );
 
+    // ---------- 视频链接（新增）----------
+    case 'video':
+      return (
+        <div className="text-center">
+          <p className="text-lg font-medium mb-3">{content.title || '视频'}</p>
+          <a
+            href={
+              content.timestamp
+                ? `${content.url}?t=${content.timestamp}`
+                : content.url
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-pink-500 text-white rounded-xl hover:bg-pink-600 transition-colors"
+          >
+            ▶️ 在{content.platform === 'bilibili' ? 'B站' : '浏览器'}中打开
+          </a>
+          {content.timestamp && (
+            <p className="text-sm text-gray-500 mt-2">
+              从 {Math.floor(content.timestamp / 60)}:
+              {(content.timestamp % 60).toString().padStart(2, '0')} 开始
+            </p>
+          )}
+        </div>
+      );
+
+    // ---------- 普通链接（新增）----------
+    case 'link':
+      return (
+        <div className="text-center">
+          <p className="text-lg font-medium mb-3">{content.title || '链接'}</p>
+          <a
+            href={content.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
+          >
+            🔗 打开链接
+          </a>
+        </div>
+      );
+
+    // ---------- App Deep Link（新增）----------
+    case 'app_link':
+      return (
+        <div className="text-center">
+          <p className="text-lg font-medium mb-3">{content.title || '应用链接'}</p>
+          <div className="flex gap-3 justify-center">
+            <a
+              href={content.scheme}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors"
+            >
+              📱 打开App
+            </a>
+            <a
+              href={content.fallback_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-colors"
+            >
+              🌐 网页打开
+            </a>
+          </div>
+        </div>
+      );
+
+    // ---------- PDF（新增）----------
+    case 'pdf':
+      return (
+        <div className="text-center">
+          <p className="text-lg font-medium mb-3">{content.title || 'PDF文档'}</p>
+          <a
+            href={content.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors"
+          >
+            📄 查看PDF {content.page ? `(第${content.page}页)` : ''}
+          </a>
+          {content.notes && (
+            <p className="text-sm text-gray-500 mt-3 italic">📝 {content.notes}</p>
+          )}
+        </div>
+      );
+
+    // ---------- 纯文本（默认）----------
     case 'text':
     default:
-      return <p className="text-lg text-gray-800 leading-relaxed whitespace-pre-wrap">{content.value}</p>;
+      return (
+        <p className="text-lg text-gray-800 leading-relaxed whitespace-pre-wrap">
+          {content.value}
+        </p>
+      );
   }
 }

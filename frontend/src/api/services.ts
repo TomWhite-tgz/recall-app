@@ -51,3 +51,36 @@ export const statsAPI = {
   overview: () =>
     api.get<StatsOverview>('/stats/overview'),
 };
+
+// ===== 文件上传（新增）=====
+export const uploadAPI = {
+  uploadFile: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post<{
+      url: string;
+      filename: string;
+      content_type: string;
+      size: number;
+    }>('/upload/file', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+};
+
+// ===== 通知设置（新增）=====
+export const settingsAPI = {
+  getNotification: () =>
+    api.get<{
+      notify_enabled: boolean;
+      notify_times: string[];
+      custom_intervals: number[] | null;
+    }>('/settings/notification'),
+
+  updateNotification: (data: {
+    notify_enabled: boolean;
+    notify_times: string[];
+    custom_intervals?: number[] | null;
+  }) =>
+    api.put('/settings/notification', data),
+};

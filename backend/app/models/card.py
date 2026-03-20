@@ -22,7 +22,9 @@ class User(Base):
 
     decks = relationship("Deck", back_populates="user", cascade="all, delete-orphan")
 
-
+    notify_enabled = Column(Boolean, default=True)
+    notify_times = Column(JSONB, default=["08:00", "12:00", "20:00"])
+    custom_intervals = Column(JSONB, default=None)  # 用户自定义间隔，null则用默认艾宾浩斯
 class Deck(Base):
     __tablename__ = "decks"
 

@@ -4,8 +4,8 @@ from contextlib import asynccontextmanager
 
 from app.config import settings
 from app.db.database import init_db, close_db
-from app.api.v1 import auth, decks, cards, review, stats
-
+# ⬇️ 看这里，只留下了 settings as settings_router
+from app.api.v1 import auth, decks, cards, review, stats, upload, settings as settings_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -48,3 +48,7 @@ async def root():
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
+app.include_router(upload.router, prefix="/api/v1/upload", tags=["文件上传"])
+# ⬇️ 这里使用的是重命名后的路由
+app.include_router(settings_router.router, prefix="/api/v1/settings", tags=["设置"])
